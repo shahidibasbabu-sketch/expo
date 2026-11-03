@@ -1,171 +1,168 @@
----
-title: Expo Build
-sidebar_title: Introduction
-description: Expo Build is a hosted service for building app binaries for your Expo and React Native projects.
----
+import React, { useState } from 'react';
+import {
+  View, Text, TouchableOpacity, TextInput,
+  ScrollView, StyleSheet, SafeAreaView,
+  Image, Alert
+} from 'react-native';
 
-import { Cube01Icon } from '@expo/styleguide-icons/outline/Cube01Icon';
+const profiles = [
+  {
+    id: 1, name: 'Maya', age: 24,
+    country: 'Nepal 🇳🇵',
+    bio: 'Travel lover, music and coffee.',
+    interests: 'Travel • Music • Food',
+    photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=700'
+  },
+  {
+    id: 2, name: 'Sofia', age: 25,
+    country: 'Italy 🇮🇹',
+    bio: 'Exploring the world and finding happiness.',
+    interests: 'Art • Travel • Books',
+    photo: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=700'
+  },
+  {
+    id: 3, name: 'Emma', age: 26,
+    country: 'United Kingdom 🇬🇧',
+    bio: 'Nature, adventures and genuine connections.',
+    interests: 'Nature • Movies • Music',
+    photo: 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=700'
+  },
+  {
+    id: 4, name: 'Ava', age: 27,
+    country: 'Canada 🇨🇦',
+    bio: 'Positive mind and beautiful adventures.',
+    interests: 'Fitness • Beach • Travel',
+    photo: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=700'
+  }
+];
 
-import { BoxLink } from '~/ui/components/BoxLink';
-import { Collapsible } from '~/ui/components/Collapsible';
-import { NoIcon, YesIcon } from '~/ui/components/DocIcons';
-import { FAQ } from '~/ui/components/FAQ';
-import { RelatedSkills } from '~/ui/components/RelatedSkills';
-import { SimulatorsLaunchCallout } from '~/ui/components/SimulatorsLaunchCallout';
-import { Terminal } from '~/ui/components/Snippet';
+const COLORS = {
+  pink: '#F04470',
+  dark: '#28202A',
+  light: '#FFF3F6',
+  grey: '#8C7D85',
+  white: '#FFFFFF'
+};
 
-**Expo Build** is a hosted service that builds app binaries (also called [standalone apps](/more/glossary-of-terms/#standalone-app)) for your Expo and React Native projects.
+export default function App() {
+  const [tab, setTab] = useState('Discover');
+  const [index, setIndex] = useState(0);
+  const [likes, setLikes] = useState([]);
+  const [matches, setMatches] = useState([]);
+  const [name, setName] = useState('Your Name');
+  const [country, setCountry] = useState('Nepal');
+  const [message, setMessage] = useState('');
+  const [chat, setChat] = useState([]);
+  const [premium, setPremium] = useState(false);
 
-Expo Build makes building your apps for distribution simple and easy to automate by providing defaults that work well for Expo and React Native projects out of the box, and by handling your app signing credentials for you (if you wish). It also makes sharing builds with your team easier than ever with [internal distribution](/build/internal-distribution/) (using [ad hoc](/build/internal-distribution/) and/or enterprise "universal" provisioning), deeply integrates with Expo Submit for app store submissions, and has first-class support for the [`expo-updates`](/build/updates/) library.
+  const person = profiles[index % profiles.length];
 
-Expo Build is also designed to work for any native project, whether or not you use Expo and React Native. It's the fastest way to get from `npx create-expo-app` or `npx @react-native-community/cli@latest init` to app stores.
+  function likeProfile() {
+    setLikes(old => old.some(p => p.id === person.id)
+      ? old : [...old, person]);
 
-<SimulatorsLaunchCallout />
+    // Sample match for preview only
+    if (person.id === 2) {
+      setMatches(old => old.some(p => p.id === person.id)
+        ? old : [...old, person]);
+      Alert.alert('💕 It is a Match!', 'You matched with Sofia!');
+    } else {
+      Alert.alert('❤️ Like sent!', 'You liked ' + person.name);
+    }
+    setIndex(index + 1);
+  }
 
-## Quick start
+  function passProfile() {
+    setIndex(index + 1);
+  }
 
-> **info** The commands for Expo Build start with `eas` and require EAS CLI. See [How to install EAS CLI](/eas/cli/#installation) for more information.
+  function sendMessage() {
+    if (!message.trim()) return;
+    setChat([...chat, message.trim()]);
+    setMessage('');
+  }
 
-To build your app, run the following command:
+  function Header() {
+    return (
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.logo}>♥ LoveConnect</Text>
+          <Text style={styles.tagline}>MEET • MATCH • CONNECT</Text>
+        </View>
+        <Text style={{fontSize: 26}}>🌍</Text>
+      </View>
+    );
+  }
 
-<Terminal cmd={['$ eas build --platform all']} />
+  function Discover() {
+    return (
+      <ScrollView contentContainerStyle={styles.page}>
+        <Text style={styles.heading}>Discover ❤️</Text>
+        <View style={styles.card}>
+          <Image
+            source={{uri: person.photo}}
+            style={styles.photo}
+            resizeMode="cover"
+          />
+          <View style={styles.personInfo}>
+            <Text style={styles.personName}>
+              {person.name}, {person.age} ✓
+            </Text>
+            <Text style={styles.country}>{person.country}</Text>
+            <Text style={styles.bio}>{person.bio}</Text>
+            <Text style={styles.interests}>
+              {person.interests}
+            </Text>
+          </View>
+        </View>
 
-This command sends your project to Expo Build and produces installable binaries for Android and iOS. You can also build for one platform at a time by passing in `--platform android` or `--platform ios` as desired. For complete setup instructions, see [Create your first build](/build/setup/).
+        <View style={styles.actionRow}>
+          <TouchableOpacity
+            style={styles.passButton}
+            onPress={passProfile}>
+            <Text style={styles.passText}>✕ Pass</Text>
+          </TouchableOpacity>
 
-### Expo Skills for AI agents
+          <TouchableOpacity
+            style={styles.likeButton}
+            onPress={likeProfile}>
+            <Text style={styles.likeText}>♥ Like</Text>
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.small}>
+          Demo profiles • Sample interactions
+        </Text>
+      </ScrollView>
+    );
+  }
 
-If you use an AI agent, install [Expo Skills](/skills/) to teach it how to create production builds and ship them to the app stores:
+  function Likes() {
+    return (
+      <ScrollView style={styles.page}>
+        <Text style={styles.heading}>Your Likes 💗</Text>
+        {likes.length === 0 ? (
+          <Text style={styles.empty}>No likes yet. Start discovering!</Text>
+        ) : likes.map(p => (
+          <View style={styles.listCard} key={p.id}>
+            <Image source={{uri:p.photo}} style={styles.avatar}/>
+            <View>
+              <Text style={styles.listName}>{p.name}, {p.age}</Text>
+              <Text style={styles.small}>{p.country}</Text>
+            </View>
+          </View>
+        ))}
+      </ScrollView>
+    );
+  }
 
-<RelatedSkills names={['eas-app-stores']} />
-
-## Key features
-
-- Cloud builds for Android and iOS with consistent environments
-- Automatically provision and manage app signing credentials or use your own
-- Share [internal distribution](/build/internal-distribution/) builds with a URL
-- Automate builds with [build profiles](/build/eas-json/#build-profiles) in **eas.json** (named sets of build settings) and integrations with [Expo Workflows](/eas/workflows/get-started/) or [CI pipelines](/build/building-on-ci/)
-- Auto-submit successful builds to app stores via [`--auto-submit`](/build/automate-submissions/) and Expo Submit
-- First-class [`expo-updates` integration](/build/updates/) with per-profile channels and [runtime version](/eas-update/runtime-versions/) guidance
-- Reuse [development builds](/develop/development-builds/introduction/) across your team. When two team members run `eas build:dev` and the project fingerprint matches, the existing build is downloaded from Expo Build instead of creating a new one
-- Faster builds via [dependency caching and custom cache paths](/build-reference/caching/)
-- Install builds and updates on devices with [Expo Orbit](https://expo.dev/orbit)
-
-## When to use Expo Build
-
-| Scenario                                                                             | Recommendation |
-| ------------------------------------------------------------------------------------ | -------------- |
-| Build production-ready binaries for app stores                                       | <YesIcon />    |
-| Share builds with testers via [internal distribution](/build/internal-distribution/) | <YesIcon />    |
-| Consistent builds across team members without local environment setup                | <YesIcon />    |
-| Automate builds from CI or [Expo Workflows](/eas/workflows/get-started/)             | <YesIcon />    |
-| Managed app signing credentials                                                      | <YesIcon />    |
-| Debugging native code locally                                                        | <NoIcon />     |
-
-## Frequently asked questions
-
-<FAQ>
-
-<Collapsible summary="How do I share builds with my team before submitting to app stores?">
-
-Use [internal distribution](/build/internal-distribution/) to share builds with a URL. Set `"distribution": "internal"` in your [build profile](/build/eas-json/#build-profiles) in **eas.json** to generate installable Android Package (APK) files for Android or [ad hoc builds](/build/internal-distribution/) for iOS.
-
-</Collapsible>
-
-<Collapsible summary="Can I use Expo Build with existing React Native projects?">
-
-Yes. Expo Build works with existing React Native projects created with `npx react-native init` or similar tools. See [Overview of using Expo with existing React Native apps](/bare/overview/) for more information.
-
-</Collapsible>
-
-<Collapsible summary="Does Expo Build handle app signing credentials?">
-
-Yes. Expo Build can generate and manage Android [keystores](/app-signing/app-credentials/#android), iOS [provisioning profiles](/app-signing/app-credentials/#ios) and [distribution certificates](/app-signing/app-credentials/#ios), or use credentials you provide. See [App signing credentials](/app-signing/app-credentials/) for more information.
-
-</Collapsible>
-
-<Collapsible summary="Can I run builds locally instead of in the cloud?">
-
-Yes. Use [local builds](/build-reference/local-builds/) with `eas build --local` to run builds on your machine. This is useful for debugging or for security policies that require local builds.
-
-</Collapsible>
-
-<Collapsible summary="Can I use Expo Build with Expo Workflows or CI pipelines?">
-
-Yes. Expo Build integrates with [Expo Workflows](/eas/workflows/get-started/) using the `build` job type. Add a build job to your workflow configuration, for example:
-
-```yaml
-jobs:
-  build_ios:
-    type: build
-    params:
-      platform: ios
-```
-
-The build job supports builds for both platforms or conditional builds based on the branch:
-
-```yaml
-jobs:
-  build:
-    type: build
-    params:
-      platform: all
-      profile: ${{ github.ref_name == 'main' && 'production' || 'preview' }}
-```
-
-For more information and other usage examples, see the [Expo Workflows build job](/eas/workflows/pre-packaged-jobs#build).
-
-Expo Build supports [builds from GitHub](/build/building-from-github/) and [building on CI](/build/building-on-ci/) with any provider.
-
-</Collapsible>
-
-<Collapsible summary="What build server infrastructure does Expo Build use?">
-
-Android builds run on Linux runners hosted in Google Cloud Platform, and iOS builds run on macOS runners hosted in Expo's macOS cloud. See [Build server infrastructure](/build-reference/infrastructure/).
-
-</Collapsible>
-
-</FAQ>
-
-## Get started
-
-<BoxLink
-  title="Create your first build"
-  description="It should only take a few minutes in total to get up and running for iOS and/or Android."
-  href="/build/setup"
-  Icon={Cube01Icon}
-/>
-
-<BoxLink
-  title="Share your apps with internal testers"
-  description="Expo Build can help share preview builds of your app with a single URL."
-  href="/build/internal-distribution"
-  Icon={Cube01Icon}
-/>
-
-<BoxLink
-  title="Automate submissions"
-  description="Learn how Expo Build can take your successful builds and handle uploading them to app stores automatically."
-  href="/build/automate-submissions"
-  Icon={Cube01Icon}
-/>
-
-<BoxLink
-  title="App version management"
-  description="Automate version bumps so you never have to think about them again."
-  href="/build-reference/app-versions"
-  Icon={Cube01Icon}
-/>
-
-<BoxLink
-  title="Run builds locally or on your own infrastructure"
-  description="Expo Build is a hosted service, and it can also run on your own machine, for example, to debug or to comply with company security policies."
-  href="/build-reference/local-builds"
-  Icon={Cube01Icon}
-/>
-
-<BoxLink
-  title="Limitations"
-  description="Expo Build is new and rapidly evolving, so we recommend getting familiar with the current limitations."
-  href="/build-reference/limitations"
-  Icon={Cube01Icon}
-/>
+  function Matches() {
+    return (
+      <ScrollView style={styles.page}>
+        <Text style={styles.heading}>Your Matches 💕</Text>
+        {matches.length === 0 ? (
+          <Text style={styles.empty}>
+            No matches yet. A match requires mutual likes.
+          </Text>
+        ) : matches.map(p => (
+          <TouchableOpacity
+            style={styles.listCar
