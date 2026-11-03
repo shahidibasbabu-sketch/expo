@@ -1,5 +1,13 @@
 # Changelog
 
+## 58.0.18
+
+### Patch Changes
+
+- Add `startSpan`, `withSpan`, and `recordSpan` to record custom trace spans, exported to EAS Observe alongside network request spans. ([#48893](https://github.com/expo/expo/pull/48893) by [@tsapeta](https://github.com/tsapeta))
+- Updated dependencies. ([#48893](https://github.com/expo/expo/pull/48893), [#50849](https://github.com/expo/expo/pull/50849))
+  - expo-app-metrics@58.0.15
+
 ## 58.0.17
 
 ### Patch Changes
